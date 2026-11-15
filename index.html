@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Çalışma Planı">
+<meta name="theme-color" content="#f7f4ff">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" href="icon.png">
+<title>AGS ve YDS Planı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday study companion, light, calm, encouraging
+   IDEA a pastel sticker notebook: tabbed days, round stickers per subject, a pressed flower branch for the week
+   PICTURE a branch across the top that grows one leaf or flower per day as the day's tasks get ticked; below it the day's list
+   COLOUR white ground, navy-grey ink; four pastel groups: lila YDS, şeftali Türkçe+Mat, nane Tarih+Coğ, gök EB+Mevzuat; butter for review
+   TYPE Fredoka for titles and numbers + Nunito
+   LAYOUT laptop: title left, countdown stickers right, branch full width, ribbon; phone: title, branch, countdowns, ribbon, tabs, list, cards */
+:root{color-scheme:light dark;--bg:light-dark(#fff,#151925);--card:light-dark(#fff,#1e2332);--ink:light-dark(#2b3245,#e9ecf5);--soft:light-dark(#667089,#a9b1c6);--line:light-dark(#e8eaf2,#2c3245);--tab:light-dark(#f5f3fc,#232839);--wash:light-dark(#f7f4ff,#1b1e2e);--k:30%;--sk:#2b3245}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark;--k:15%}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--k:15%}}
+@supports not (color:light-dark(#fff,#000)){:root{--bg:#fff;--card:#fff;--ink:#2b3245;--soft:#667089;--line:#e8eaf2;--tab:#f5f3fc;--wash:#f7f4ff}.band{background-image:radial-gradient(#e6defc 1.2px,transparent 1.3px)}.note{background:#fdf3cf}}
+@media(prefers-color-scheme:dark){@supports not (color:light-dark(#fff,#000)){:root{--bg:#151925;--card:#1e2332;--ink:#e9ecf5;--soft:#a9b1c6;--line:#2c3245;--tab:#232839;--wash:#1b1e2e}.band{background-image:radial-gradient(#262a40 1.2px,transparent 1.3px)}.note{background:#3a3420}}}
+*{box-sizing:border-box;min-width:0}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Nunito,system-ui,sans-serif;overflow-x:clip}
+.band{background:var(--wash);background-image:radial-gradient(light-dark(#e6defc,#262a40) 1.2px,transparent 1.3px);background-size:20px 20px;padding:26px 0 20px}
+.in{max-width:980px;margin:0 auto;padding:0 max(4vw,16px)}
+.hd{display:grid;grid-template-areas:"t" "b" "c" "r";gap:14px}
+@media(min-width:720px){.hd{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"t c" "b b" "r r";align-items:center}}
+h1{grid-area:t;font:600 clamp(32px,7vw,46px)/1.05 Fredoka,system-ui,sans-serif;margin:0;letter-spacing:-.01em;text-wrap:balance}
+h2{font:600 24px/1.15 Fredoka,system-ui,sans-serif;margin:0 0 12px}
+.br{grid-area:b}
+.fig{position:relative;height:clamp(150px,24vw,200px)}
+.fig>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.cap{font-size:14px;color:var(--soft);margin:2px 0 0}
+.cap b{color:var(--ink)}
+.cd{grid-area:c;display:flex;gap:12px;flex-wrap:wrap}
+.cd div{border-radius:20px;padding:10px 18px;border:2px solid var(--sk);box-shadow:3px 4px 0 color-mix(in srgb,var(--sk) 20%,transparent);color:#2b3245;flex:1 1 140px}
+.cd b{display:block;font:600 clamp(38px,9vw,50px)/1 Fredoka,system-ui,sans-serif}
+.cd span{font-size:14px;font-weight:600;white-space:nowrap}
+.rw{grid-area:r}
+.rib{display:flex;height:30px;border-radius:999px;overflow:hidden;position:relative;font-size:13px;font-weight:800;border:2px solid var(--sk)}
+.rib i{display:flex;align-items:center;justify-content:center;font-style:normal;white-space:nowrap;overflow:hidden;color:#2b3245;padding:0 6px}
+.mk{position:absolute;top:0;bottom:0;width:4px;background:var(--sk)}
+.ribl{display:flex;justify-content:space-between;font-size:13px;margin-top:6px;color:var(--soft);font-weight:600}
+.pn{margin:10px 0 0}
+main{padding-bottom:40px}
+.seg{display:flex;gap:8px;margin:20px 0 12px;flex-wrap:wrap}
+.seg button,.tabs button{font:inherit;cursor:pointer;border:0;color:var(--ink)}
+.seg button{min-height:44px;padding:0 18px;border-radius:999px;background:var(--tab);font-weight:800}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.tabs{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;position:sticky;top:0;z-index:2;background:var(--bg);padding:8px 0}
+.tabs button{min-height:56px;border-radius:16px;background:var(--tab);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.15;font-weight:800;font-size:15px;position:relative}
+.tabs button small{font-weight:600;font-size:13px;color:var(--soft)}
+.tabs button[aria-selected=true]{background:var(--ink);color:var(--bg)}
+.tabs button[aria-selected=true] small{color:inherit;opacity:.8}
+.tabs button.today::after{content:"";position:absolute;top:6px;right:8px;width:8px;height:8px;border-radius:50%;background:#ff9f73}
+button:focus-visible,input:focus-visible+.sw{outline:3px solid #8f74e0;outline-offset:2px}
+.leg{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px}
+.leg span{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--soft)}
+.leg span::before{content:"";width:14px;height:14px;border-radius:50%;background:var(--c);border:1.5px solid var(--sk)}
+.day{background:var(--card);border-radius:24px;padding:20px;border:1px solid var(--line)}
+.dh{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.dh h2{margin:0}
+.prog{font-weight:800;color:var(--soft);font-size:14px;white-space:nowrap}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.chip{background:var(--tab);border-radius:999px;padding:4px 12px;font-size:14px;font-weight:700}
+.note{background:light-dark(#fdf3cf,#3a3420);border-radius:14px;padding:10px 14px;margin:10px 0;font-weight:700}
+.den{display:flex;align-items:center;gap:12px;margin:6px 0 12px;cursor:pointer;font-weight:700;min-height:44px}
+.den input{position:absolute;opacity:0}
+.sw{width:50px;height:30px;border-radius:999px;background:var(--line);position:relative;flex:none;transition:background .2s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .2s}
+.den input:checked+.sw{background:#e0b83f}
+.den input:checked+.sw::after{transform:translateX(20px)}
+.hint{font-size:13px;color:var(--soft);margin:0 0 12px}
+ol{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.it{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border-radius:18px;background:color-mix(in srgb,var(--c) var(--k),var(--card))}
+.it.soft{background:transparent;border:2px dashed color-mix(in srgb,var(--c) 90%,transparent)}
+.it.done{opacity:.5}
+.it.done .t{text-decoration:line-through}
+.sk{width:52px;height:52px;border-radius:50%;background:var(--c);border:2px solid var(--sk);box-shadow:2px 3px 0 color-mix(in srgb,var(--sk) 22%,transparent);display:grid;place-items:center}
+.sk svg{width:26px;height:26px;fill:none;stroke:#2b3245;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.t{font-weight:800;font-size:17px;line-height:1.25}
+.tg{display:inline-block;background:var(--c);color:#2b3245;border:1.5px solid var(--sk);border-radius:8px;padding:0 8px;font-size:13px;font-weight:800;margin:4px 6px 0 0;white-space:nowrap}
+.d{font-size:15px;color:var(--soft);line-height:1.35}
+.rt{display:flex;align-items:center;gap:8px}
+.dots{color:var(--d);color:light-dark(var(--d),var(--c));font-size:13px;letter-spacing:2px;white-space:nowrap;font-weight:800}
+.ck{width:44px;height:44px;border-radius:14px;border:2px solid var(--d);border-color:light-dark(var(--d),var(--c));background:var(--card);cursor:pointer;display:grid;place-items:center;padding:0}
+.ck svg{width:24px;height:24px;stroke:#fff;stroke-width:3;fill:none;opacity:0}
+.ck[aria-pressed=true]{background:var(--d)}
+.ck[aria-pressed=true] svg{opacity:1}
+.why{margin:16px 0 0;color:var(--soft);font-size:15px;border-top:1px dashed var(--line);padding-top:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px;margin-top:14px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:20px}
+.flow{display:flex;align-items:flex-start;gap:4px}
+.st{flex:1;text-align:center;font-size:14px;line-height:1.3;color:var(--soft)}
+.st .sk{margin:0 auto 8px}
+.st b{display:block;font-size:16px;color:var(--ink)}
+.ar{color:var(--soft);font-size:22px;padding-top:12px}
+.after{margin:14px 0 0;font-size:15px;color:var(--soft)}
+.rules{display:grid;gap:10px;counter-reset:r}
+.rules li{display:flex;gap:12px}
+.rules li::before{counter-increment:r;content:counter(r);flex:none;width:30px;height:30px;border-radius:50%;background:var(--c,#c9b6f2);border:1.5px solid var(--sk);color:#2b3245;display:grid;place-items:center;font-weight:800;font-size:14px}
+.chain{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin:10px 0}
+.chain span{aspect-ratio:1;border-radius:10px;background:var(--tab)}
+.chain span.on{background:#ffc9a8;border:1.5px solid var(--sk)}
+.chain span.now{outline:2px dashed #ff9f73;outline-offset:1px}
+.big{font:600 32px/1 Fredoka,system-ui,sans-serif}
+.w{font-size:13px;color:var(--soft);margin-top:10px}
+.fl{transform-box:fill-box;transform-origin:center}
+.pop{animation:pop .6s cubic-bezier(.3,1.6,.5,1)}
+@keyframes pop{from{transform:scale(.2)}to{transform:scale(1)}}
+@media(max-width:600px){.day{padding:16px 12px}.it{grid-template-columns:44px minmax(0,1fr) auto;gap:10px;padding:10px}.sk{width:44px;height:44px}.it .sk svg{width:22px;height:22px}.tabs{gap:4px}.tabs button{font-size:14px}.rib i{font-size:12px}.st .sk{width:46px;height:46px}}
+@media(prefers-reduced-motion:reduce){.sw,.sw::after{transition:none}.pop{animation:none}}
+</style>
+</head>
+<body>
+<header class="band"><div class="in hd">
+<h1>AGS ve YDS Planı</h1>
+<div class="br"><div class="fig" id="fig"><svg id="sv" aria-hidden="true"></svg></div><p class="cap" id="cap"></p></div>
+<div class="cd"><div style="background:#c9b6f2"><b id="cy">–</b><span>gün · YDS 28 Mart</span></div><div style="background:#ffc9a8"><b id="ca">–</b><span>gün · AGS 8 Mayıs</span></div></div>
+<div class="rw"><div class="rib" id="rib"></div><div class="ribl"><span>16 Kasım</span><span>28 Mart</span><span>8 Mayıs</span></div><p class="pn" id="pn"></p></div>
+</div></header>
+<main><div class="in">
+<div class="seg" role="group" aria-label="Dönem"><button id="vy" type="button">YDS dönemi</button><button id="va" type="button">AGS dönemi</button></div>
+<nav class="tabs" id="tabs" role="tablist" aria-label="Günler"></nav>
+<div class="leg"><span style="--c:#c9b6f2">YDS</span><span style="--c:#ffc9a8">Türkçe · Matematik</span><span style="--c:#a8e0cf">Tarih · Coğrafya</span><span style="--c:#b5d8f5">EB · Mevzuat</span><span style="--c:#f6e19a">Tekrar</span></div>
+<section class="day" id="day" aria-live="polite"></section>
+<div class="grid">
+<section class="box"><h2>Matematik zinciri</h2><div class="big" id="cn"></div><div class="chain" id="ch"></div><div class="w">Son 3 hafta. Matematiği işaretlediğin her gün bir kare dolar.</div></section>
+<section class="box"><h2>Dershane akşamı formülü</h2><div class="flow" id="ff"></div><p class="after">Sonrası kendiliğinden gelir: 2–3 gün sonra karma test, Pazar haftalık test, 4 haftada bir büyük tekrar.</p></section>
+<section class="box"><h2>Matematik nasıl</h2><div class="flow" id="mf"></div><p class="after">Hedef süre değil, soru: o günün soruları bitince matematik biter. Takıldığın soruyu işaretle, 3 gün sonra yeniden çöz.</p></section>
+<section class="box"><h2>Bir gün aksarsa</h2><ol class="rules" style="--c:#f8cfda">
+<li>Kaçan iş ertesi güne eklenmez, Pazar'ın "eksik kapatma"sına yazılır.</li>
+<li>Kötü günde sadece Matematik ve kartlar yapılır. Zincir kopmasın, yeter.</li>
+<li>Pazar da yetmezse önce Türkçe testi, sonra Tarih ve Coğrafya karma testi düşer. Matematik ve kartlar hiç düşmez.</li>
+</ol></section>
+<section class="box"><h2>Mevzuat başlayınca</h2><ol class="rules" style="--c:#b5d8f5">
+<li>Dershanede gördüğün akşam aynı formül: İzle, Hatırla, Çöz.</li>
+<li>Önemli kanun maddeleri kart olur, kelime kartlarının yanında tekrar edilir.</li>
+<li>Yeri Tarih ve Coğrafya karma testinden alınır. Dershanede hiç başlamazsa 29 Mart'tan sonra videoyla sen başlarsın.</li>
+</ol></section>
+</div>
+</div></main>
+<script>
+{
+const G={l:['#c9b6f2','#6b4fc4'],p:['#ffc9a8','#c4622f'],n:['#a8e0cf','#23806a'],g:['#b5d8f5','#2f73ad'],b:['#f6e19a','#94740e'],m:['#f8cfda','#b2486a']};
+const SV={yds:'<path d="M3 5.5C5.5 4.5 8.5 4.5 12 6.5c3.5-2 6.5-2 9-1v13c-2.5-1-5.5-1-9 1-3.5-2-6.5-2-9-1z"/><path d="M12 6.5v13"/>',kart:'<rect x="3.5" y="7" width="12" height="13" rx="2"/><path d="M8 4h10.5a2 2 0 0 1 2 2v11"/><path d="M7 12h5M7 15.5h3"/>',mat:'<path d="M7 4v6M4 7h6M14.5 7h5.5M4.5 15.5l5 5M9.5 15.5l-5 5M17.25 15v.01M14.5 18h5.5M17.25 21v.01"/>',tur:'<path d="M4.5 18c2.6 0 4.2-1.8 4.2-4.6V8H4.5v5.2h4.2M15.3 18c2.6 0 4.2-1.8 4.2-4.6V8h-4.2v5.2h4.2"/>',tar:'<path d="M6 3h12M6 21h12M7.5 3v2.5c0 2.6 4.5 4 4.5 6.5s-4.5 3.9-4.5 6.5V21M16.5 3v2.5c0 2.6-4.5 4-4.5 6.5s4.5 3.9 4.5 6.5V21M10 18.5h4"/>',cog:'<path d="M2.5 19.5l6-9 4 5.5 2.5-3 6.5 6.5z"/><circle cx="17" cy="6.5" r="2.5"/>',eb:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.7.5 1 1.3 1 2.1h5c0-.8.3-1.6 1-2.1A6 6 0 0 0 12 3z"/>',mev:'<path d="M12 4v16M7 20h10M5 7h14M5 7l-2.5 6a2.8 2.8 0 0 0 5 0zM19 7l-2.5 6a2.8 2.8 0 0 0 5 0z"/>',rep:'<path d="M20 11a8 8 0 0 0-14.5-4.5M4 3.5v3.5h3.5M4 13a8 8 0 0 0 14.5 4.5M20 20.5V17h-3.5"/>',den:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM8.5 12l1.5 1.5 3-3M8.5 17h7"/>',cup:'<path d="M4 9h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM17 10h1.5a2.5 2.5 0 0 1 0 5H17M8 3.5c-.8 1 .8 2 0 3M12 3.5c-.8 1 .8 2 0 3"/>',leaf:'<path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14zM5 19l7-7"/>',cap:'<path d="M2 9l10-5 10 5-10 5zM6 11v5c3 2 9 2 12 0v-5"/>',play:'<path d="M8 5l11 7-11 7z"/>',pen:'<path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 7l3 3"/>',chk:'<path d="M5 12l4 4 10-10"/>',sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/>',up:'<path d="M4 18l5-6 4 3 7-9M15 6h5v5"/>',star:'<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.5 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/>'};
+const SUB={mat:['p','mat'],tur:['p','tur'],yds:['l','yds'],kel:['l','kart'],tar:['n','tar'],cog:['n','cog'],eb:['g','eb'],mev:['g','mev'],mk:['g','kart'],tek:['b','rep'],den:['b','den'],mola:['m','cup'],free:['m','leaf'],ders:['m','cap']};
+const TG={f:'İzle → Hatırla → Çöz',t:'Test',o:'Okuma',k:'Kart',d:'Deneme',x:'Isın → Ana → Bonus'};
+const ico=(k,c,small)=>`<span class="sk" style="--c:${c}"><svg viewBox="0 0 24 24">${SV[k]}</svg></span>`;
+const I=(s,t,d,k,n)=>({s,t,d,k,n});
+const BIG=I('mola','Yemek + Big Five','mola, ödül','m');
+const KEL=I('kel','Kelime kartları','günün kapanışı','k',0);
+const MK=I('mk','Kartlar','mevzuat maddeleri + EB kavramları','k',0);
+const Y=[
+{w:[],l:[I('mat','Matematik','karışık eski konular','x',1),I('yds','YDS okuma','parça + paragraf soruları','o',2),BIG,I('yds','YDS çeviri ve cümle tamamlama','','t',1),I('tek','Karma test','Çarşamba Tarih + Cuma EB konuları','t',1),KEL],y:'Haftanın en uzun boş günü. YDS\'de en çok net kaybettiren okuma ve çeviri burada.'},
+{w:['Türkçe','Coğrafya','Matematik'],l:[I('mat','Matematik','bugünkü konu, kolaydan zora','x',1),I('yds','YDS gramer soruları','ek kaynaktan, karışık','t',1),BIG,I('cog','Coğrafya','bugünkü konu','f',1),I('tur','Türkçe test','sadece soru','t',0),KEL],y:'Coğrafya aynı akşam tekrar ediliyor; unutma en hızlı ilk günde olur. Türkçe güçlü, sadece test.'},
+{w:['Tarih','Matematik'],l:[I('mat','Matematik','bugünkü konu, kolaydan zora','x',1),I('yds','YDS okuma','1 parça + sorular','o',1),BIG,I('tar','Tarih','bugünkü konu','f',1),I('tek','Karma test','dünkü Coğrafya + geçen haftanın EB\'si','t',1),KEL],y:'Haftanın en uzun akşamı. Dünkü Coğrafya burada ilk tekrarını görüyor.'},
+{w:['Öğrenme Psk.','Öğretim Yöntemleri'],l:[I('mat','Matematik','karışık eski konular','x',1),I('eb','Eğitim Bilimleri','bugünkü iki konu','f',2),BIG,I('yds','YDS cümle tamamlama + çeviri','','t',1),KEL],y:'En kısa akşam: sadece günün EB konuları ve bir YDS. Matematik karışık; sınavdaki gibi yöntem seçmeyi çalıştırır.'},
+{w:['Öğrenme Psk.','Tarih','YDS akşam'],l:[I('mat','Matematik','kütüphanede, 5 kolay soru','x',0),I('kel','Kelime kartları','kütüphanede','k',0),I('mola','Gerçek mola','yemek + Big Five + kısa yürüyüş','m'),I('ders','YDS dersi','dinç gir','s'),I('free','Akşam çalışma yok','eve dön, dinlen','r')],y:'Kütüphanede bilerek az çalışılıyor ki YDS dersine enerji kalsın. Cuma\'nın Tarih ve EB\'si yarına kalıyor.'},
+{w:['YDS'],l:[I('mat','Matematik','karışık eski konular','x',1),I('yds','YDS','bu sabahki dersin konusundan soru','t',1),BIG,I('tar','Tarih','dünkü konu','f',1),I('eb','Eğitim Bilimleri','dünkü Öğrenme Psk.','f',1),I('tur','Türkçe test','sadece soru','t',0),KEL],y:'Sabahki YDS dersi ve dünkü dersler aynı gün pekişiyor; haftanın en dolu akşamı bu yüzden.'},
+{w:[],l:[I('mat','Matematik','karışık','x',1),I('tek','Haftalık karma test','haftanın Tarih, Coğrafya, EB konuları karışık','t',2),I('tek','Hata defteri','haftanın yanlışlarını yeniden çöz','t',1),I('tek','Eksik kapatma','hafta içinde kaçanlar','t',1),I('yds','YDS okuma','1 parça','o',1),I('free','Öğleden sonra serbest','dinlenmek de planın parçası','r')],y:'Haftanın konuları karışık sorularla geri çağrılıyor. Her 4. Pazar karma test son 4 haftayı kapsar.'}];
+const A=[
+{w:[],l:[I('mat','Matematik','karışık eski konular','x',1),I('eb','Eğitim Bilimleri','eksik konu ya da soru bankası','t',2),BIG,I('mev','Mevzuat','','f',1),I('tek','Karma test','Çarşamba Tarih + Cuma EB konuları','t',1),MK],y:'Boş gün en büyük paya gidiyor: EB 80 sorunun 30\'u.'},
+{w:['Türkçe','Coğrafya','Matematik'],l:[I('mat','Matematik','bugünkü konu, kolaydan zora','x',1),I('eb','Eğitim Bilimleri','soru bankası','t',1),BIG,I('cog','Coğrafya','bugünkü konu','f',1),I('tur','Türkçe test','sadece soru','t',1),MK],y:'Dershane konusu aynı akşam pekişiyor, EB her gün devam ediyor.'},
+{w:['Tarih','Matematik'],l:[I('mat','Matematik','bugünkü konu, kolaydan zora','x',1),I('eb','Eğitim Bilimleri','soru bankası','t',2),BIG,I('tar','Tarih','bugünkü konu','f',1),I('mev','Mevzuat','soru','t',1),MK],y:'Uzun akşam EB\'ye ve Mevzuat\'a; Tarih tek oturumla sınırlı, çünkü 6 soru.'},
+{w:['Öğrenme Psk.','Öğretim Yöntemleri'],l:[I('mat','Matematik','karışık eski konular','x',1),I('eb','Eğitim Bilimleri','bugünkü iki konu','f',2),BIG,I('tur','Türkçe test','sadece soru','t',1),MK],y:'Günün EB konuları aynı akşam pekişiyor.'},
+{w:['Öğrenme Psk.','Tarih'],l:[I('mat','Matematik','kütüphanede','x',1),I('eb','Eğitim Bilimleri','kütüphanede, bugünkü konu','f',1),BIG,I('tar','Tarih','bugünkü konu','f',1),MK],y:'YDS dersi bittiği için kütüphane artık normal çalışma; Cuma\'nın konuları aynı gün pekişiyor.'},
+{w:[],l:[I('mat','Matematik','karışık eski konular','x',1),I('eb','Eğitim Bilimleri','soru bankası','t',2),BIG,I('tek','Karma test','Salı Coğrafya + Çarşamba Tarih','t',1),I('tur','Türkçe test','sadece soru','t',1),I('mev','Mevzuat','soru','t',1),MK],y:'YDS dersi kalmadığı için Cumartesi tümüyle boş; yükün çoğu EB\'ye.'},
+{w:[],l:[I('mat','Matematik','karışık','x',1),I('tek','Haftalık karma test','tüm AGS dersleri karışık','t',2),I('tek','Hata defteri','haftanın yanlışlarını yeniden çöz','t',1),I('tek','Eksik kapatma','hafta içinde kaçanlar','t',1),I('free','Öğleden sonra serbest','dinlenmek de planın parçası','r')],y:'Haftanın konuları karışık sorularla geri çağrılıyor.'}];
+const DEN=v=>({den:1,l:[I('den','Dershane denemesi','','d'),I('tek','Yanlış analizi','yanlış kelimeler karta, yanlış konular hata defterine','t',1),BIG,I('mat','Matematik','kısa: 5 soru','x',0),v==='y'?KEL:MK],y:'Deneme olan gün planın geri kalanı düşer; kaçanlar Pazar\'ın eksik kapatmasına.'});
+const SP={'2027-03-27':{l:[I('kel','Kelime kartları','','k',0),I('yds','YDS okuma','1 parça, hafif','o',0),I('free','Erken uyku','yarın sınav','r')],y:'Sınavdan önceki gün yeni bir şey yok; sadece kartlar ve hafif bir okuma.'},
+'2027-03-28':{l:[I('den','YDS sınavı','başarılar','d'),I('free','Sonrası serbest','','r')],y:'Bugün sadece sınav.'},
+'2027-03-29':{l:[I('free','Dinlenme günü','yarın AGS dönemi başlıyor','r')],y:'YDS\'den sonra bir gün tam dinlenme.'},
+'2027-05-07':{l:[I('tek','Hata defterine göz at','hafif','t',0),MK,I('free','Erken uyku','yarın sınav','r')],y:'Sınavdan önceki gün yeni bir şey yok.'},
+'2027-05-08':{l:[I('den','AGS sınavı','başarılar','d')],y:'Bugün sadece sınav.'}};
+['2027-05-04','2027-05-05','2027-05-06'].forEach(k=>SP[k]={l:[I('mat','Matematik','karışık, kolay-orta','x',1),I('tek','Hata defteri','yanlışları yeniden çöz','t',2),I('tek','Kısa karma testler','tüm dersler','t',1),MK],y:'Son hafta: yeni konu yok, sadece hata defteri ve kısa testler.'});
+const PH={temel:['Temel dönem','her gün kart ve matematik; dershane konusu aynı akşam pekişir.'],yuk:['YDS yükseliş','okuma ve çeviri ağırlık kazanır; denemedeki bilinmeyen kelimeler karta.'],fin:['YDS final','Tarih, Coğrafya ve EB\'de video yok: sadece Hatırla ve Çöz. Boşalan yer YDS\'ye.'],ags:['AGS dönemi','sadece AGS. Soru payı: EB 30 · Türkçe 15 · Matematik 15 · Mevzuat 8 · Tarih 6 · Coğrafya 6.']};
+const DN=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'],DL=['Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi','Pazar'],MO=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+const p2=n=>String(n).padStart(2,'0');
+const iso=d=>d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());
+const add=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const pd=s=>{const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c)};
+const days=(a,b)=>Math.round((b-a)/864e5);
+const ph=s=>s<'2027-01-04'?'temel':s<'2027-03-01'?'yuk':s<='2027-03-28'?'fin':'ags';
+const st={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const now=new Date();const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());const tIso=iso(today);
+const ti=(today.getDay()+6)%7;const mon=add(today,-ti);
+const real=ph(tIso)==='ags'?'a':'y';
+let view=real,sel=ti;
+const cdv=(el,s)=>{const n=days(today,pd(s));el.textContent=n>0?n:n===0?'Bugün':'✓'};
+cdv(document.getElementById('cy'),'2027-03-28');cdv(document.getElementById('ca'),'2027-05-08');
+const segs=[['2026-11-16','2027-01-04','#e4dafb','Temel'],['2027-01-04','2027-03-01','#c9b6f2','YDS yükseliş'],['2027-03-01','2027-03-29','#a991ea','Final'],['2027-03-29','2027-05-09','#ffc9a8','AGS']];
+const S0=pd('2026-11-16'),tot=days(S0,pd('2027-05-09'));
+document.getElementById('rib').innerHTML=segs.map(g=>`<i style="width:${days(pd(g[0]),pd(g[1]))/tot*100}%;background:${g[2]}">${g[3]}</i>`).join('')+`<span class="mk" style="left:calc(${Math.min(100,Math.max(0,days(S0,today)/tot*100))}% - 2px)"></span>`;
+const P=PH[ph(tIso)];document.getElementById('pn').innerHTML=`Şu an <b>${P[0]}</b>: ${P[1]}`;
+const step=(k,c,b,t)=>`<div class="st">${ico(k,c)}<b>${b}</b>${t}</div>`,ar='<div class="ar">›</div>';
+document.getElementById('ff').innerHTML=step('play','#c9b6f2','İzle','konunun özet videosu, hızlı')+ar+step('pen','#a8e0cf','Hatırla','defter kapalı, aklında kalanı yaz')+ar+step('chk','#b5d8f5','Çöz','o konudan test, yanlışlar karta');
+document.getElementById('mf').innerHTML=step('sun','#ffe2cf','Isın','eski konudan 3 kolay soru')+ar+step('up','#ffc9a8','Ana','haftanın konusu, kolay-orta')+ar+step('star','#ffad85','Bonus','1 zor soru, çıkmazsa çözüme bak');
+const vy=document.getElementById('vy'),va=document.getElementById('va'),tabs=document.getElementById('tabs'),day=document.getElementById('day'),sv=document.getElementById('sv'),fig=document.getElementById('fig');
+const dots=n=>n===undefined?'':n===0?'kısa':'●'.repeat(n);
+const FC=['#c9b6f2','#ffc9a8','#a8e0cf','#b5d8f5','#f8cfda','#f6e19a','#c9b6f2'];
+let prev=[];
+function wk(){return DN.map((_,i)=>{const d=add(mon,i),k=iso(d),r=st.get('ay:'+k);const q=r&&r.tot?r.done.length/r.tot:0;return k>tIso?'bud':q>=.5?'fl':q>0?'sm':k<tIso?'leaf':'now'})}
+function petals(x,y,r,c){let h='';for(let a=0;a<5;a++){const t=a*72*Math.PI/180-Math.PI/2;h+=`<circle cx="${(x+Math.cos(t)*r*.62).toFixed(1)}" cy="${(y+Math.sin(t)*r*.62).toFixed(1)}" r="${(r*.5).toFixed(1)}" fill="${c}" stroke="#2b3245" stroke-width="1.5"/>`}return h+`<circle cx="${x}" cy="${y}" r="${(r*.34).toFixed(1)}" fill="#f6e19a" stroke="#2b3245" stroke-width="1.5"/>`}
+function leaf(x,y,s,ang){return`<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${ang})"><path d="M0 0C${s*.3} ${-s*.45} ${s*.8} ${-s*.45} ${s} 0C${s*.8} ${s*.45} ${s*.3} ${s*.45} 0 0z" fill="#a8e0cf" stroke="#2b3245" stroke-width="1.4"/><path d="M${s*.1} 0H${s*.8}" stroke="#2b3245" stroke-width="1" fill="none"/></g>`}
+function draw(){const W=fig.clientWidth,H=fig.clientHeight;if(!W)return;const S=wk();const r=Math.max(13,Math.min(W/20,H*.15));
+const pts=S.map((_,i)=>[W*(.07+.86*i/6),H*.52+(i%2?-1:1)*H*.07]);
+let d=`M-12 ${H*.6}`;let p0=[-12,H*.6];pts.concat([[W+12,H*.45]]).forEach(p=>{const mx=(p0[0]+p[0])/2;d+=` C${mx} ${p0[1]} ${mx} ${p[1]} ${p[0]} ${p[1]}`;p0=p});
+let h=`<path d="${d}" fill="none" stroke="#7fb8a5" stroke-width="5" stroke-linecap="round"/><path d="${d}" fill="none" stroke="#2b3245" stroke-width="1.4" stroke-opacity=".55"/>`;
+for(let i=0;i<6;i++){const a=pts[i],b=pts[i+1];h+=leaf((a[0]+b[0])/2,(a[1]+b[1])/2,r*.9,i%2?150:-30)}
+S.forEach((s,i)=>{const[x,y]=pts[i];const up=i%2===0;const ty=y+(up?-1:1)*H*.27;const tx=x+(up?r*.25:-r*.25);
+h+=`<path d="M${x} ${y}Q${x} ${(y+ty)/2} ${tx} ${ty}" stroke="#7fb8a5" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+const pop=prev.length&&prev[i]!==s?' pop':'';let g='';
+if(s==='fl')g=petals(tx,ty,r,FC[i]);
+else if(s==='sm')g=petals(tx,ty,r*.68,FC[i]);
+else if(s==='leaf')g=leaf(tx-r*.5,ty,r*1.1,up?-70:70);
+else g=`<path d="M${tx} ${ty-r*.55}C${tx+r*.42} ${ty-r*.1} ${tx+r*.32} ${ty+r*.4} ${tx} ${ty+r*.45}C${tx-r*.32} ${ty+r*.4} ${tx-r*.42} ${ty-r*.1} ${tx} ${ty-r*.55}z" fill="${s==='now'?FC[i]:'#e8f5ef'}" stroke="#2b3245" stroke-width="1.4"/>`+(s==='now'?`<circle cx="${tx}" cy="${ty}" r="${r*.95}" fill="none" stroke="#ff9f73" stroke-width="2" stroke-dasharray="4 4"/>`:'');
+h+=`<g class="fl${pop}">${g}</g>`});
+sv.innerHTML=h;prev=S;
+const n=S.filter(s=>s==='fl'||s==='sm').length;document.getElementById('cap').innerHTML=`Bu hafta <b>${n} çiçek</b>. İşlerinin yarısını bitirdiğin gün dal bir çiçek açar.`}
+if(window.ResizeObserver)new ResizeObserver(draw).observe(fig);else addEventListener('resize',draw);
+function chain(){const ch=document.getElementById('ch');let h='',run=0;const on=i=>{const r=st.get('ay:'+iso(add(today,-i)));return!!(r&&r.done&&r.done.includes('mat'))};
+for(let i=20;i>=0;i--)h+=`<span class="${on(i)?'on':''}${i===0?' now':''}"></span>`;
+for(let i=0;i<=60;i++){if(on(i))run++;else if(i>0)break}
+ch.innerHTML=h;document.getElementById('cn').textContent=run?run+' gün üst üste':'İlk kare bugün'}
+function render(){
+vy.setAttribute('aria-pressed',view==='y');va.setAttribute('aria-pressed',view==='a');
+tabs.innerHTML=DN.map((n,i)=>{const d=add(mon,i);return`<button type="button" role="tab" data-i="${i}" aria-selected="${i===sel}" class="${i===ti?'today':''}">${n}<small>${d.getDate()}</small></button>`}).join('');
+const d=add(mon,sel),k=iso(d),live=sel===ti&&view===real;
+const rec=st.get('ay:'+k)||{done:[],den:false};
+const base=(view==='y'?Y:A)[sel];let plan=base,note='';
+if(view===real&&SP[k])plan=SP[k];
+if(live&&rec.den&&!SP[k])plan=DEN(view);
+const fin=view==='y'&&ph(k)==='fin';
+if(view==='y'&&k>='2027-03-22'&&k<='2027-03-26')note='YDS\'ye son günler: yeni konu yok, kartlar ve kısa testler.';
+if(view==='y'&&k>'2027-03-28'||view==='a'&&k<'2027-03-29')note=view==='y'?'Bu hafta AGS dönemi; YDS şablonu sadece önizleme.':'Bu şablon 29 Mart\'tan itibaren geçerli; şu an önizleme.';
+let n=0,dn=0;
+const rows=plan.l.map((it,i)=>{const[g,ic]=SUB[it.s];const[c,dc]=G[g];const soft=g==='m';const id=it.s==='mat'?'mat':(plan.den?'d':'n')+i;const on=rec.done.includes(id);if(!soft){n++;if(on)dn++}
+let tg=TG[it.k]||'';if(it.k==='f'&&fin&&['tar','cog','eb'].includes(it.s))tg='Hatırla → Çöz';
+const ck=soft||!live?'':`<button type="button" class="ck" data-id="${id}" aria-pressed="${on}" aria-label="${it.t} tamam"><svg viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg></button>`;
+return`<li class="it${soft?' soft':''}${on&&live?' done':''}" style="--c:${c};--d:${dc}">${ico(ic,c)}<span><span class="t">${it.t}</span><br>${tg?`<span class="tg">${tg}</span>`:''}<span class="d">${it.d}</span></span><span class="rt"><span class="dots">${soft?'':dots(it.n)}</span>${ck}</span></li>`}).join('');
+if(live&&rec.tot!==n){rec.tot=n;st.set('ay:'+k,rec)}
+const ders=plan===base?`<div class="chips">${base.w.length?`<span class="chip">Dershane</span>${base.w.map(w=>`<span class="chip">${w}</span>`).join('')}`:'<span class="chip">Dershane yok</span>'}</div>`:'';
+const dt=live&&!SP[k]?`<label class="den"><input type="checkbox" id="dn" ${rec.den?'checked':''}><span class="sw"></span>Bugün dershane denemesi var</label>`:'';
+day.innerHTML=`<div class="dh"><h2>${DL[sel]} · ${d.getDate()} ${MO[d.getMonth()]}</h2>${live?`<span class="prog">${dn} / ${n} tamam</span>`:''}</div>${ders}${note?`<div class="note">${note}</div>`:''}${dt}<p class="hint">Sırayla git, seçme. ● bir oturum, "kısa" yarım oturum.</p><ol>${rows}</ol><p class="why">${plan.y}</p>`;
+chain();draw()}
+tabs.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;sel=+b.dataset.i;render()});
+vy.addEventListener('click',()=>{view='y';render()});va.addEventListener('click',()=>{view='a';render()});
+const upd=f=>{const k='ay:'+tIso;const r=st.get(k)||{done:[],den:false};f(r);st.set(k,r);render()};
+day.addEventListener('click',e=>{const b=e.target.closest('.ck');if(!b)return;const id=b.dataset.id;upd(r=>{r.done=r.done.includes(id)?r.done.filter(x=>x!==id):r.done.concat(id)})});
+day.addEventListener('change',e=>{if(e.target.id==='dn')upd(r=>{r.den=e.target.checked})});
+render();
+}
+</script>
+</body>
+</html>
