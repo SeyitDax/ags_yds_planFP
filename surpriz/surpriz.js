@@ -454,7 +454,7 @@ const CSS=`
 @media(prefers-reduced-motion:reduce){.o24-stars i,.o24-bq .spk{animation:none;opacity:.45}.o24x .pop{animation:none;transform:none}.o24-sl.on .fg,.o24-sl.out .fg{animation:none}.o24-env,.o24-lines p,.o24-card p{transition-property:opacity}.o24-glow.go{animation:none}.o24-bq,.o24-bqi,.o24-bq .glw{animation:none;transform:none;opacity:1;filter:none;-webkit-mask-image:none;mask-image:none}.o24-bq .fall,.o24-bq .bk,.o24-rays{display:none}.o24-sig{clip-path:none;transition:none}.o24-envi,.o24-sealw,.o24-tw,.o24-env.shk .o24-envz{animation:none}.o24-tw{display:none}.o24-flapw{transition-duration:.25s}}`;
 
 /* ---------- durum ---------- */
-let root=null,aud=null,audU='',run=0,opt={},content=null,urls=[],photosP=null,cachedRaw=null,prevOv='',wasPlaying=false,tm={};
+let root=null,aud=null,live=false,run=0,opt={},content=null,urls=[],photosP=null,cachedRaw=null,prevOv='',wasPlaying=false,tm={};
 const S={},$=s=>root.querySelector(s);
 const tset=(fn,ms)=>{clearTimeout(tm.id);tm={fn,left:ms,end:Date.now()+ms,id:setTimeout(()=>{tm={};fn()},ms)}};
 const tclr=()=>{clearTimeout(tm.id);tm={}};
@@ -463,7 +463,7 @@ const tresume=()=>{if(tm.fn&&!tm.id){const fn=tm.fn;tm.end=Date.now()+tm.left;tm
 const show=k=>Object.keys(S).forEach(n=>S[n].classList.toggle('on',n===k));
 const later=(sec,list,my)=>list.forEach(([i,ms])=>setTimeout(()=>{if(my===run)sec.querySelectorAll('.o24-later')[i].classList.add('on')},RM?Math.min(ms,600):ms));
 
-function sndUI(){if(!root)return;const off=!aud||aud.muted||aud.paused,b=$('.o24-snd');b.innerHTML=off?IC.off:IC.on;b.setAttribute('aria-label',off?'Sesi aç':'Sesi kapat')}
+function sndUI(){if(!root)return;const off=!aud||aud.muted||!live,b=$('.o24-snd');b.innerHTML=off?IC.off:IC.on;b.setAttribute('aria-label',off?'Sesi aç':'Sesi kapat')}
 const playA=()=>{try{const p=aud.play();if(p)p.then(sndUI,sndUI)}catch(e){}};
 // iOS/Android sesi ancak bir dokunuşun içinde başlatmaya izin veriyor. Cevap klavyeden "git" ile gönderilince bu dokunuş sayılmayabiliyor
 // ve şifre çözme birkaç saniye sürüyor. Bu yüzden zarf açılana kadar her dokunuşta şarkı çal-durdur ile "kilidi açılır" (sessiz değil:
@@ -484,7 +484,7 @@ function build(){
 <section class="o24-s o24-buket"></section><section class="o24-s o24-mektup"></section><section class="o24-s o24-slayt"></section><section class="o24-s o24-son"></section><div class="o24-flash"></div>`;
   ['perde','buket','mektup','slayt','son'].forEach(k=>S[k]=$('.o24-'+k));
   $('.o24-cls').onclick=close;
-  $('.o24-snd').onclick=()=>{if(aud.paused){aud.muted=false;playA()}else aud.muted=!aud.muted;sndUI()};
+  $('.o24-snd').onclick=()=>{if(!live){aud.muted=false;if(aud.error||(!aud.paused&&aud.currentTime<.5))aud.load();playA()}else aud.muted=!aud.muted;sndUI()}; // takıldıysa dokunuşla yeniden yükle
   $('.o24-ask').onsubmit=onAsk;
 }
 
@@ -496,9 +496,8 @@ async function start(o){
   build();document.body.appendChild(root);
   prevOv=document.documentElement.style.overflow;document.documentElement.style.overflow='hidden';
   document.addEventListener('visibilitychange',onVis);document.addEventListener('keydown',onKey);
-  armed=false;opened=false;aud=new Audio(B+'sarki.mp3');aud.preload='auto';aud.addEventListener('pause',sndUI);aud.addEventListener('play',sndUI);aud.addEventListener('volumechange',sndUI);
-  // şarkıyı perde yazıları akarken tamamen indir; dokunuştan önce inerse çalmaya hemen hazır olur
-  {const a=aud;fetch(B+'sarki.mp3').then(r=>{if(!r.ok)throw 0;return r.blob()}).then(bl=>{if(aud!==a||armed)return;audU=URL.createObjectURL(bl);a.src=audU;a.load()}).catch(()=>{})}
+  armed=false;opened=false;aud=new Audio(B+'sarki.mp3');aud.preload='auto';live=false;aud.addEventListener('playing',()=>{live=true;sndUI()});['pause','waiting','ended','emptied','error'].forEach(n=>aud.addEventListener(n,()=>{live=false;sndUI()}));aud.addEventListener('volumechange',sndUI);
+  aud.load();
   root.addEventListener('touchend',unlock,{capture:true,passive:true});root.addEventListener('click',unlock,true);
   const my=++run,mp=prefetch();
   nextFrame(()=>root.classList.add('on'));show('perde');
@@ -603,9 +602,9 @@ function son(my){
 
 function close(){
   if(!root)return;run++;tclr();if(!opt.preview)ls.set('ogr24:seen','1');
-  const r=root,a=aud,u=urls,au=audU;root=null;aud=null;urls=[];photosP=null;audU='';armed=false;opened=false;
+  const r=root,a=aud,u=urls;root=null;aud=null;live=false;urls=[];photosP=null;armed=false;opened=false;
   document.removeEventListener('visibilitychange',onVis);document.removeEventListener('keydown',onKey);
-  let v=a.volume;const iv=setInterval(()=>{v-=.08;if(v<=0||a.paused){clearInterval(iv);a.pause();a.removeAttribute('src');a.load();if(au)URL.revokeObjectURL(au)}else a.volume=v},80);
+  let v=a.volume;const iv=setInterval(()=>{v-=.08;if(v<=0||a.paused){clearInterval(iv);a.pause();a.removeAttribute('src');a.load()}else a.volume=v},80);
   r.classList.remove('on');
   setTimeout(()=>{r.remove();u.forEach(x=>URL.revokeObjectURL(x));document.documentElement.style.overflow=prevOv},1000)}
 
