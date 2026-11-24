@@ -118,10 +118,12 @@ ol{list-style:none;margin:0;padding:0;display:grid;gap:10px}
 @keyframes pop{from{transform:scale(.2)}to{transform:scale(1)}}
 @media(max-width:600px){.day{padding:16px 12px}.it{grid-template-columns:44px minmax(0,1fr) auto;gap:10px;padding:10px}.sk{width:44px;height:44px}.it .sk svg{width:22px;height:22px}.tabs{gap:4px}.tabs button{font-size:14px}.rib i{font-size:12px}.st .sk{width:46px;height:46px}}
 @media(prefers-reduced-motion:reduce){.sw,.sw::after{transition:none}.pop{animation:none}}
+.o24w{display:flex;justify-content:flex-end;margin-top:-16px;margin-bottom:8px}.o24w[hidden]{display:none}
+.o24{font:800 13px/1 Nunito,system-ui,sans-serif;min-height:36px;padding:0 14px;border-radius:999px;border:2px solid var(--sk);background:#f8cfda;color:#2b3245;box-shadow:2px 3px 0 color-mix(in srgb,var(--sk) 22%,transparent);cursor:pointer}
 </style>
 </head>
 <body>
-<header class="band"><div class="in hd">
+<header class="band"><div class="in o24w" id="o24w" hidden><button type="button" class="o24" id="o24">🌷 Öğretmenler Günü</button></div><div class="in hd">
 <h1>AGS ve YDS Planı</h1>
 <div class="br"><div class="fig" id="fig"><svg id="sv" aria-hidden="true"></svg></div><p class="cap" id="cap"></p></div>
 <div class="cd"><div style="background:#c9b6f2"><b id="cy">–</b><span>gün · YDS 28 Mart</span></div><div style="background:#ffc9a8"><b id="ca">–</b><span>gün · AGS 8 Mayıs</span></div></div>
@@ -259,6 +261,12 @@ const upd=f=>{const k='ay:'+tIso;const r=st.get(k)||{done:[],den:false};f(r);st.
 day.addEventListener('click',e=>{const b=e.target.closest('.ck');if(!b)return;const id=b.dataset.id;upd(r=>{r.done=r.done.includes(id)?r.done.filter(x=>x!==id):r.done.concat(id)})});
 day.addEventListener('change',e=>{if(e.target.id==='dn')upd(r=>{r.den=e.target.checked})});
 render();
+{/* 24 Kasım sürprizi: surpriz/surpriz.js yalnızca gerekince yüklenir. ?surpriz önizler, ?surpriz=soru soruyu yeniden sordurur. */
+const q=new URLSearchParams(location.search),pv=q.has('surpriz'),w=document.getElementById('o24w');let L=null;
+const go=o=>(L||(L=new Promise((res,rej)=>{const s=document.createElement('script');s.src='surpriz/surpriz.js?v=14';s.onload=()=>res(window.OGR24);s.onerror=()=>{L=null;s.remove();rej()};document.head.appendChild(s)}))).then(x=>x.start(o)).catch(()=>{});
+if(tIso>='2026-11-24'||pv){w.hidden=false;document.getElementById('o24').addEventListener('click',()=>go({preview:pv}))}
+let seen=null;try{seen=localStorage.getItem('ogr24:seen')}catch(e){}
+if(pv||(tIso==='2026-11-24'||/[#&]k=/.test(location.hash))&&!seen)go({preview:pv,reset:q.get('surpriz')==='soru'})}
 }
 </script>
 </body>
