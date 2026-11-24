@@ -238,13 +238,20 @@ function bouquet(){
   const bk=[[120,120,7],[292,108,6],[90,230,8],[318,236,6],[150,70,5],[250,62,6],[206,40,4],[60,160,5],[344,170,5],[110,290,4],[296,300,5],[200,150,4]].map(([x,y,s],i)=>`<circle class="bk" cx="${x}" cy="${y}" r="${s}" fill="url(#o24bk)" style="--d:${(2+i*.55).toFixed(2)}s;--t:${(5+i%4).toFixed(1)}s"/>`).join('');
   const sp=[[146,84,5],[268,80,4],[76,190,4],[330,196,5],[204,58,3.5]].map(([x,y,s],i)=>spark(x,y,s,3800+i*320)).join('');
   const fall=[0,1,2,3].map(i=>{const x=96+i*68,y=36+(i%2)*18;return`<g class="fall" style="--d:${(6+i*2.1).toFixed(1)}s;--t:${(9+i%2*2).toFixed(1)}s;--dx:${(i%2?-1:1)*(26+i*8)}px"><path d="M${x} ${y}c-5 4-6 11-1 15 5-2 8-9 6-15-2-1-4-1-5 0z" fill="#f7c3d3" fill-opacity=".9"/></g>`}).join('');
-  return`<svg class="o24-bq" viewBox="0 64 400 432" aria-hidden="true"><defs>${BQDEFS}${BQDEFS2}<pattern id="o24tx" width="48" height="48" patternUnits="userSpaceOnUse"><image href="${tex()}" width="48" height="48"/></pattern></defs>
-<circle class="glw" cx="200" cy="200" r="210" fill="url(#o24g)"/>
-<g class="sway">
+  // Telefonda kasmasın diye buket (çok sayıda blur/gölge filtresi) tek seferlik resme çevrilir: bqArt bir <img> olarak bir kez çizilir,
+  // hareket (doğuş, salınım) resmin kendisine CSS ile verilir. Hafif süsler (ışıltı, bokeh, düşen yaprak) ayrı, filtresiz katmanlarda.
+  return{art:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 64 400 432" width="800" height="864"><defs>${BQDEFS}${BQDEFS2}<pattern id="o24tx" width="48" height="48" patternUnits="userSpaceOnUse"><image href="${tex()}" width="48" height="48"/></pattern></defs>
 ${wrapBack()}
 ${lb}${st}${gb}${hd}${gf}${lf}
 ${wrapFront()}
-</g>${bk}${sp}${fall}</svg>`}
+</svg>`,back:`<svg class="o24-bql" viewBox="0 64 400 432" aria-hidden="true"><defs><radialGradient id="o24g"><stop offset="0" stop-color="#ffe3ec" stop-opacity=".5"/><stop offset=".5" stop-color="#f6b8cb" stop-opacity=".16"/><stop offset="1" stop-color="#f6b8cb" stop-opacity="0"/></radialGradient><radialGradient id="o24bk"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".4" stop-color="#ffe1ea" stop-opacity=".5"/><stop offset="1" stop-color="#ffd1df" stop-opacity="0"/></radialGradient></defs><circle class="glw" cx="200" cy="200" r="210" fill="url(#o24g)"/></svg>`,
+  front:`<svg class="o24-bql" viewBox="0 64 400 432" aria-hidden="true">${bk}${sp}${fall}</svg>`}}
+let BQ=null;
+// buket resmini hazırlar (zarf açılırken arka planda); aynı resim "Tekrar izle"de de kullanılır
+function prepBq(){
+  if(BQ)return BQ.p;const b=bouquet(),u=URL.createObjectURL(new Blob([b.art],{type:'image/svg+xml'})),im=new Image();
+  im.className='o24-bqi';im.alt='';im.src=u;BQ={u,b,p:im.decode().catch(()=>{})};return BQ.p}
+function bqHTML(){return`<div class="o24-bq" aria-hidden="true">${BQ.b.back}<img class="o24-bqi" src="${BQ.u}" alt="">${BQ.b.front}</div>`}
 // hüzmeler: [açı, genişlik px, uzunluk vmax, opaklık, gecikme ms, nabız s]. Tabanı geniş, ucu incelip silikleşir; her birinin bulanık bir ışıltı kopyası var
 const RAYS=(()=>{let R=7,h='';const rnd=()=>(R=(R*9301+49297)%233280)/233280;
   for(let k=0;k<24;k++){const a=Math.round(k*15+(rnd()-.5)*11),up=Math.cos(a*Math.PI/180)>.2,w=2+rnd()*(k%3?8:16),l=Math.round((up?50:28)+rnd()*(up?48:34)),o=(.55+rnd()*.45).toFixed(2),d=Math.round(rnd()*420),p=(1.8+rnd()*1.6).toFixed(1);
@@ -394,23 +401,14 @@ const CSS=`
 .o24-buket h2{margin:0;font:600 clamp(30px,8.4vw,46px)/1.08 Fredoka,system-ui,sans-serif;color:#fff}
 .o24-buket h2 span{display:block}
 .o24-sub{margin:0;color:#c9b6f2;font-weight:700}
-.o24-bq{display:block;height:min(56vh,500px);width:auto;max-width:100%;overflow:visible;flex:0 1 auto;min-height:0;animation:o24born 1.9s cubic-bezier(.2,.7,.2,1) both}
-@keyframes o24born{from{opacity:0;transform:scale(.9);filter:blur(12px) brightness(2.2)}60%{filter:blur(2px) brightness(1.3)}to{opacity:1;transform:none;filter:none}}
-.o24-bq .stem{stroke-dasharray:1;stroke-dashoffset:1;animation:o24draw 1.4s ease-out var(--d) forwards}
-@keyframes o24draw{to{stroke-dashoffset:0}}
+.o24-bq{position:relative;width:100%;height:min(56vh,500px);flex:0 1 auto;min-height:0;animation:o24born 1.9s cubic-bezier(.2,.7,.2,1) both}
+@keyframes o24born{from{opacity:0;transform:scale(.9) translateY(14px);filter:blur(10px) brightness(2)}60%{filter:blur(1px) brightness(1.25)}to{opacity:1;transform:none;filter:none}}
+.o24-bq>*{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.o24-bqi{display:block;object-fit:contain;transform-origin:50% 96%;-webkit-mask-image:linear-gradient(to top,#000 42%,transparent 72%);mask-image:linear-gradient(to top,#000 42%,transparent 72%);-webkit-mask-size:100% 300%;mask-size:100% 300%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:0 0;mask-position:0 0;animation:o24rise 2.8s cubic-bezier(.3,.6,.3,1) .15s forwards,o24sway 7s ease-in-out 5s infinite;will-change:transform}
+@keyframes o24rise{to{-webkit-mask-position:0 100%;mask-position:0 100%}}
+@keyframes o24sway{25%{transform:rotate(1deg)}75%{transform:rotate(-1deg)}}
 .o24x .pop{transform-box:fill-box;transform-origin:center;transform:scale(0);animation:o24pop .9s cubic-bezier(.3,1.6,.5,1) var(--d) forwards}
 @keyframes o24pop{to{transform:scale(1)}}
-.o24-bq .grow,.o24-bq .head,.o24-bq .pl,.o24-bq .bob,.o24-bq .sway{transform-box:view-box}
-.o24-bq .grow{transform:scale(.3,0);animation:o24grow 1.3s cubic-bezier(.25,1.2,.4,1) var(--d) forwards}
-@keyframes o24grow{to{transform:none}}
-.o24-bq .head{opacity:0;transform:scale(.15);animation:o24head 1.4s cubic-bezier(.2,.9,.25,1.12) var(--d) forwards}
-@keyframes o24head{40%{opacity:1}to{opacity:1;transform:none}}
-.o24-bq .pl{transform:rotate(var(--r));animation:o24open 2s cubic-bezier(.3,.7,.2,1) calc(var(--d) + 450ms) forwards}
-@keyframes o24open{to{transform:none}}
-.o24-bq .bob{animation:o24bob var(--b) ease-in-out var(--bd) infinite alternate}
-@keyframes o24bob{from{transform:rotate(-1.6deg)}to{transform:rotate(1.6deg)}}
-.o24-bq .sway{transform-origin:200px 480px;animation:o24sway 7s ease-in-out 5s infinite}
-@keyframes o24sway{25%{transform:rotate(1deg)}75%{transform:rotate(-1deg)}}
 .o24-bq .glw{opacity:0;transform-box:fill-box;transform-origin:center;animation:o24glw 2.5s ease-out .4s forwards,o24pulse 4.5s ease-in-out 2.9s infinite alternate}
 @keyframes o24glw{to{opacity:1}}
 @keyframes o24pulse{from{opacity:1;transform:scale(1)}to{opacity:.65;transform:scale(1.07)}}
@@ -453,10 +451,10 @@ const CSS=`
 .o24-card em{font-style:normal;font-weight:700;color:#b2486a}
 .o24-mini{width:180px;height:auto;overflow:visible}
 .o24-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px}
-@media(prefers-reduced-motion:reduce){.o24-stars i,.o24-bq .spk{animation:none;opacity:.45}.o24-bq .stem{animation:none;stroke-dashoffset:0}.o24x .pop{animation:none;transform:none}.o24-sl.on .fg,.o24-sl.out .fg{animation:none}.o24-env,.o24-lines p,.o24-card p{transition-property:opacity}.o24-glow.go{animation:none}.o24-bq,.o24-bq .grow,.o24-bq .glw,.o24-bq .head,.o24-bq .pl,.o24-bq .bob,.o24-bq .sway{animation:none;transform:none;opacity:1;filter:none}.o24-bq .fall,.o24-bq .bk,.o24-rays{display:none}.o24-sig{clip-path:none;transition:none}.o24-envi,.o24-sealw,.o24-tw,.o24-env.shk .o24-envz{animation:none}.o24-tw{display:none}.o24-flapw{transition-duration:.25s}}`;
+@media(prefers-reduced-motion:reduce){.o24-stars i,.o24-bq .spk{animation:none;opacity:.45}.o24x .pop{animation:none;transform:none}.o24-sl.on .fg,.o24-sl.out .fg{animation:none}.o24-env,.o24-lines p,.o24-card p{transition-property:opacity}.o24-glow.go{animation:none}.o24-bq,.o24-bqi,.o24-bq .glw{animation:none;transform:none;opacity:1;filter:none;-webkit-mask-image:none;mask-image:none}.o24-bq .fall,.o24-bq .bk,.o24-rays{display:none}.o24-sig{clip-path:none;transition:none}.o24-envi,.o24-sealw,.o24-tw,.o24-env.shk .o24-envz{animation:none}.o24-tw{display:none}.o24-flapw{transition-duration:.25s}}`;
 
 /* ---------- durum ---------- */
-let root=null,aud=null,run=0,opt={},content=null,urls=[],photosP=null,cachedRaw=null,prevOv='',wasPlaying=false,tm={};
+let root=null,aud=null,audU='',run=0,opt={},content=null,urls=[],photosP=null,cachedRaw=null,prevOv='',wasPlaying=false,tm={};
 const S={},$=s=>root.querySelector(s);
 const tset=(fn,ms)=>{clearTimeout(tm.id);tm={fn,left:ms,end:Date.now()+ms,id:setTimeout(()=>{tm={};fn()},ms)}};
 const tclr=()=>{clearTimeout(tm.id);tm={}};
@@ -465,9 +463,12 @@ const tresume=()=>{if(tm.fn&&!tm.id){const fn=tm.fn;tm.end=Date.now()+tm.left;tm
 const show=k=>Object.keys(S).forEach(n=>S[n].classList.toggle('on',n===k));
 const later=(sec,list,my)=>list.forEach(([i,ms])=>setTimeout(()=>{if(my===run)sec.querySelectorAll('.o24-later')[i].classList.add('on')},RM?Math.min(ms,600):ms));
 
-function sndUI(){const off=!aud||aud.muted||aud.paused,b=$('.o24-snd');b.innerHTML=off?IC.off:IC.on;b.setAttribute('aria-label',off?'Sesi aç':'Sesi kapat')}
+function sndUI(){if(!root)return;const off=!aud||aud.muted||aud.paused,b=$('.o24-snd');b.innerHTML=off?IC.off:IC.on;b.setAttribute('aria-label',off?'Sesi aç':'Sesi kapat')}
 const playA=()=>{try{const p=aud.play();if(p)p.then(sndUI,sndUI)}catch(e){}};
-const unlock=()=>{try{const p=aud.play();if(p)p.catch(()=>{});aud.pause()}catch(e){}};
+// iOS/Android sesi ancak bir dokunuşun içinde başlatmaya izin veriyor. Cevap klavyeden "git" ile gönderilince bu dokunuş sayılmayabiliyor
+// ve şifre çözme birkaç saniye sürüyor; bu yüzden ilk dokunuşta şarkı sessizce çalmaya başlar, zarf açılınca baştan ve sesli devam eder.
+let armed=false;
+const unlock=()=>{if(armed||!aud)return;armed=true;aud.muted=true;try{const p=aud.play();if(p)p.catch(()=>{armed=false})}catch(e){armed=false}};
 function onVis(){if(!root)return;if(document.hidden){root.classList.add('paused');wasPlaying=!aud.paused;aud.pause();tpause()}else{root.classList.remove('paused');if(wasPlaying)playA();tresume()}}
 function onKey(e){if(e.key==='Escape')close()}
 
@@ -494,7 +495,10 @@ async function start(o){
   build();document.body.appendChild(root);
   prevOv=document.documentElement.style.overflow;document.documentElement.style.overflow='hidden';
   document.addEventListener('visibilitychange',onVis);document.addEventListener('keydown',onKey);
-  aud=new Audio(B+'sarki.mp3');aud.preload='auto';aud.addEventListener('pause',sndUI);aud.addEventListener('play',sndUI);
+  armed=false;aud=new Audio(B+'sarki.mp3');aud.preload='auto';aud.addEventListener('pause',sndUI);aud.addEventListener('play',sndUI);aud.addEventListener('volumechange',sndUI);
+  // şarkıyı perde yazıları akarken tamamen indir; dokunuştan önce inerse çalmaya hemen hazır olur
+  {const a=aud;fetch(B+'sarki.mp3').then(r=>{if(!r.ok)throw 0;return r.blob()}).then(bl=>{if(aud!==a||armed)return;audU=URL.createObjectURL(bl);a.src=audU;a.load()}).catch(()=>{})}
+  root.addEventListener('touchend',unlock,{capture:true,passive:true});root.addEventListener('click',unlock,true);
   const my=++run,mp=prefetch();
   nextFrame(()=>root.classList.add('on'));show('perde');
   const lines=$('.o24-lines');await wait(1000);
@@ -532,8 +536,8 @@ async function decPhotos(key){
   urls=list;return list}
 
 async function openEnv(key,my){
-  photosP=decPhotos(key);photosP.catch(()=>{});
-  aud.currentTime=0;playA();$('.o24-snd').hidden=false;
+  photosP=decPhotos(key);photosP.catch(()=>{});prepBq();
+  try{aud.currentTime=0}catch(e){}aud.muted=false;playA();$('.o24-snd').hidden=false;
   const env=$('.o24-env'),fl=$('.o24-flash');
   $('.o24-ask').classList.remove('on');env.classList.add('open');       // 1) mühür kırılır, kapak 3D açılır
   await wait(RM?300:950);if(my!==run)return;
@@ -545,6 +549,7 @@ async function openEnv(key,my){
   await wait(RM?100:650);if(my!==run)return;
   fl.classList.remove('out');fl.classList.add('go');                      //    ekran beyaza boğulur
   await wait(RM?200:1100);if(my!==run)return;
+  await prepBq();if(my!==run)return;
   S.perde.style.transition='none';buket(my);                              // 5) beyaz kısa bir an kalır, buket sahnesi
   await wait(300);if(my!==run)return;
   fl.classList.add('out');fl.classList.remove('go');
@@ -552,7 +557,7 @@ async function openEnv(key,my){
 
 function buket(my){
   tclr();const s=S.buket;
-  s.innerHTML=`<h2 class="o24-later"><span>${BASLIK[0]}</span><span>${BASLIK[1]}</span></h2>${bouquet()}<p class="o24-sub o24-later">${ALT}</p><button class="o24-btn o24-later" type="button">Mektubun var ›</button>`;
+  s.innerHTML=`<h2 class="o24-later"><span>${BASLIK[0]}</span><span>${BASLIK[1]}</span></h2>${bqHTML()}<p class="o24-sub o24-later">${ALT}</p><button class="o24-btn o24-later" type="button">Mektubun var ›</button>`;
   show('buket');later(s,[[0,4300],[1,5400],[2,6600]],my);
   s.querySelector('button').onclick=()=>{tclr();mektup(my)};
   tset(()=>{if(my===run)mektup(my)},19000)}
@@ -592,14 +597,14 @@ function son(my){
   const s=S.son;S.slayt.onclick=null;
   s.innerHTML=`${MINI}<h2 class="o24-later">${vurgu(content.kapanis||'Seni seviyorum')}</h2><p class="o24-later">Öğretmenler Günün kutlu olsun 🌷</p><div class="o24-row o24-later"><button class="o24-btn ghost" type="button" data-a="r">Tekrar izle</button><button class="o24-btn" type="button" data-a="c">Plana dön</button></div>`;
   show('son');later(s,[[0,700],[1,1900],[2,3200]],my);
-  s.querySelector('[data-a=r]').onclick=()=>{const m2=++run;aud.currentTime=0;aud.muted=false;playA();buket(m2)};
+  s.querySelector('[data-a=r]').onclick=()=>{const m2=++run;aud.currentTime=0;aud.muted=false;playA();prepBq().then(()=>{if(m2===run)buket(m2)})};
   s.querySelector('[data-a=c]').onclick=close}
 
 function close(){
   if(!root)return;run++;tclr();if(!opt.preview)ls.set('ogr24:seen','1');
-  const r=root,a=aud,u=urls;root=null;aud=null;urls=[];photosP=null;
+  const r=root,a=aud,u=urls,au=audU;root=null;aud=null;urls=[];photosP=null;audU='';armed=false;
   document.removeEventListener('visibilitychange',onVis);document.removeEventListener('keydown',onKey);
-  let v=a.volume;const iv=setInterval(()=>{v-=.08;if(v<=0||a.paused){clearInterval(iv);a.pause();a.removeAttribute('src');a.load()}else a.volume=v},80);
+  let v=a.volume;const iv=setInterval(()=>{v-=.08;if(v<=0||a.paused){clearInterval(iv);a.pause();a.removeAttribute('src');a.load();if(au)URL.revokeObjectURL(au)}else a.volume=v},80);
   r.classList.remove('on');
   setTimeout(()=>{r.remove();u.forEach(x=>URL.revokeObjectURL(x));document.documentElement.style.overflow=prevOv},1000)}
 
