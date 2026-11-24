@@ -466,9 +466,10 @@ const later=(sec,list,my)=>list.forEach(([i,ms])=>setTimeout(()=>{if(my===run)se
 function sndUI(){if(!root)return;const off=!aud||aud.muted||aud.paused,b=$('.o24-snd');b.innerHTML=off?IC.off:IC.on;b.setAttribute('aria-label',off?'Sesi aç':'Sesi kapat')}
 const playA=()=>{try{const p=aud.play();if(p)p.then(sndUI,sndUI)}catch(e){}};
 // iOS/Android sesi ancak bir dokunuşun içinde başlatmaya izin veriyor. Cevap klavyeden "git" ile gönderilince bu dokunuş sayılmayabiliyor
-// ve şifre çözme birkaç saniye sürüyor; bu yüzden ilk dokunuşta şarkı sessizce çalmaya başlar, zarf açılınca baştan ve sesli devam eder.
-let armed=false;
-const unlock=()=>{if(armed||!aud)return;armed=true;aud.muted=true;try{const p=aud.play();if(p)p.catch(()=>{armed=false})}catch(e){armed=false}};
+// ve şifre çözme birkaç saniye sürüyor. Bu yüzden zarf açılana kadar her dokunuşta şarkı çal-durdur ile "kilidi açılır" (sessiz değil:
+// Safari sessiz çalmayı izin saymıyor, sonra sesi açınca şarkıyı durduruyor). Zarf açılınca şarkı sesli başlar.
+let armed=false,opened=false;
+const unlock=()=>{if(opened||!aud)return;armed=true;aud.muted=false;try{const p=aud.play();if(p)p.catch(()=>{});aud.pause()}catch(e){}};
 function onVis(){if(!root)return;if(document.hidden){root.classList.add('paused');wasPlaying=!aud.paused;aud.pause();tpause()}else{root.classList.remove('paused');if(wasPlaying)playA();tresume()}}
 function onKey(e){if(e.key==='Escape')close()}
 
@@ -495,7 +496,7 @@ async function start(o){
   build();document.body.appendChild(root);
   prevOv=document.documentElement.style.overflow;document.documentElement.style.overflow='hidden';
   document.addEventListener('visibilitychange',onVis);document.addEventListener('keydown',onKey);
-  armed=false;aud=new Audio(B+'sarki.mp3');aud.preload='auto';aud.addEventListener('pause',sndUI);aud.addEventListener('play',sndUI);aud.addEventListener('volumechange',sndUI);
+  armed=false;opened=false;aud=new Audio(B+'sarki.mp3');aud.preload='auto';aud.addEventListener('pause',sndUI);aud.addEventListener('play',sndUI);aud.addEventListener('volumechange',sndUI);
   // şarkıyı perde yazıları akarken tamamen indir; dokunuştan önce inerse çalmaya hemen hazır olur
   {const a=aud;fetch(B+'sarki.mp3').then(r=>{if(!r.ok)throw 0;return r.blob()}).then(bl=>{if(aud!==a||armed)return;audU=URL.createObjectURL(bl);a.src=audU;a.load()}).catch(()=>{})}
   root.addEventListener('touchend',unlock,{capture:true,passive:true});root.addEventListener('click',unlock,true);
@@ -536,7 +537,7 @@ async function decPhotos(key){
   urls=list;return list}
 
 async function openEnv(key,my){
-  photosP=decPhotos(key);photosP.catch(()=>{});prepBq();
+  photosP=decPhotos(key);photosP.catch(()=>{});prepBq();opened=true;
   try{aud.currentTime=0}catch(e){}aud.muted=false;playA();$('.o24-snd').hidden=false;
   const env=$('.o24-env'),fl=$('.o24-flash');
   $('.o24-ask').classList.remove('on');env.classList.add('open');       // 1) mühür kırılır, kapak 3D açılır
@@ -602,7 +603,7 @@ function son(my){
 
 function close(){
   if(!root)return;run++;tclr();if(!opt.preview)ls.set('ogr24:seen','1');
-  const r=root,a=aud,u=urls,au=audU;root=null;aud=null;urls=[];photosP=null;audU='';armed=false;
+  const r=root,a=aud,u=urls,au=audU;root=null;aud=null;urls=[];photosP=null;audU='';armed=false;opened=false;
   document.removeEventListener('visibilitychange',onVis);document.removeEventListener('keydown',onKey);
   let v=a.volume;const iv=setInterval(()=>{v-=.08;if(v<=0||a.paused){clearInterval(iv);a.pause();a.removeAttribute('src');a.load();if(au)URL.revokeObjectURL(au)}else a.volume=v},80);
   r.classList.remove('on');

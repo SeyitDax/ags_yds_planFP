@@ -263,7 +263,7 @@ day.addEventListener('change',e=>{if(e.target.id==='dn')upd(r=>{r.den=e.target.c
 render();
 {/* 24 Kasım sürprizi: surpriz/surpriz.js yalnızca gerekince yüklenir. ?surpriz önizler, ?surpriz=soru soruyu yeniden sordurur. */
 const q=new URLSearchParams(location.search),pv=q.has('surpriz'),w=document.getElementById('o24w');let L=null;
-const go=o=>(L||(L=new Promise((res,rej)=>{const s=document.createElement('script');s.src='surpriz/surpriz.js?v=15';s.onload=()=>res(window.OGR24);s.onerror=()=>{L=null;s.remove();rej()};document.head.appendChild(s)}))).then(x=>x.start(o)).catch(()=>{});
+const go=o=>(L||(L=new Promise((res,rej)=>{const s=document.createElement('script');s.src='surpriz/surpriz.js?v=16';s.onload=()=>res(window.OGR24);s.onerror=()=>{L=null;s.remove();rej()};document.head.appendChild(s)}))).then(x=>x.start(o)).catch(()=>{});
 if(tIso>='2026-11-24'||pv){w.hidden=false;document.getElementById('o24').addEventListener('click',()=>go({preview:pv}))}
 let seen=null;try{seen=localStorage.getItem('ogr24:seen')}catch(e){}
 if(pv||(tIso==='2026-11-24'||/[#&]k=/.test(location.hash))&&!seen)go({preview:pv,reset:q.get('surpriz')==='soru'})}
